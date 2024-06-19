@@ -1,0 +1,45 @@
+dynamicPlugins:
+  frontend:
+    backstage-community.plugin-tech-insights:
+      dynamicRoutes:
+        - importName: TechInsightsScorecardPage
+          menuItem:
+            icon: dashboard
+            text: Tech Insight
+          path: /tech-insights
+      mountPoints:
+        - config:
+            layout:
+              gridColumnEnd:
+                md: span 8
+                xs: span 12
+            props:
+              description: Description of the scorecards
+              title: Tech insights scorecard
+          importName: EntityTechInsightsScorecardCard
+          mountPoint: entity.page.overview/cards
+techInsights:
+  factChecker:
+    checks:
+      groupOwnerCheck:
+        description: >-
+          Verifies that a group has been set as the spec.owner for
+          this entity
+        factIds:
+          - entityOwnershipFactRetriever
+        name: Group Owner Check
+        rule:
+          conditions:
+            all:
+              - fact: hasGroupOwner
+                operator: equal
+                value: true
+        type: json-rules-engine
+  factRetrievers:
+    entityOwnershipFactRetriever:
+      cadence: '*/15 * * * *'
+      initialDelay:
+        minutes: 1
+      lifecycle:
+        timeToLive:
+          weeks: 2
