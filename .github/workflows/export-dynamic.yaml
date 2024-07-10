@@ -10,14 +10,25 @@ on:
         options:
           - '18.x'
           - '20.x'
+      
       upload-project-on-error:
         description: Upload the complete project as a workflow artifact in case of error in order to troubleshoot.
         required: false
         type: boolean
         default: false
+      
+      workspace-path:
+        description: Relative path of a single workspace on which the export workflow should be applied.
+        required: false
+        type: string
 
   push:
-    tags: ["v*.*.*"]
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - 'releases/**'
 
 concurrency:
   group: ${{ github.workflow }}
@@ -53,10 +64,24 @@ jobs:
         id: gather-workspaces
         shell: bash
         run: |
+          workspacePath=''
+          if [[ "${{ github.event.inputs.workspace-path }}" != "" ]]
+          then
+            workspacePath="${{  github.event.inputs.workspace-path }}"
+          elif [[ "${{ github.event_name }}" == 'pull_request' ]] && [[ "${{ github.head_ref }}" == "workspaces/"* ]]
+          then
+            workspacePath="$(echo '${{ github.head_ref }}' | sed -e 's:workspaces/[^_]*__\(.*\)$:workspaces/\1:')"
+          fi
+
           json=$(
             echo -n '['
             for d in $(find workspaces -mindepth 1 -type d)
             do
+              if [[ "${workspacePath}" != "" ]] && [[ "${workspacePath}" != "$d" ]]
+              then
+                continue
+              fi
+
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/plugins-repo-ref" ]]
               then
                 echo -n "${comma} {\"plugins-root\": \"${d}\", \"plugins-repo-ref\": \"$(cat ${d}/plugins-repo-ref)\"}"
