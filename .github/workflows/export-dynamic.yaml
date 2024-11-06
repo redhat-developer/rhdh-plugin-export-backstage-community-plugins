@@ -59,6 +59,14 @@ jobs:
       overlay-repo-ref: ${{ steps.set-overlay-repo-ref.outputs.OVERLAY_REPO_REF }}
 
     steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        if: ${{ github.event.inputs.overlay-branch == '' }} 
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        if: ${{ github.event.inputs.overlay-branch != '' }} 
+        with:
+          ref: ${{ github.event.inputs.overlay-branch }}
+      
       - name: Set overlay_ref
         id: set-overlay-repo-ref 
         run: |
@@ -69,10 +77,6 @@ jobs:
             echo "OVERLAY_REPO_REF=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
     
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          ref: ${{ steps.set-overlay-repo-ref.outputs.OVERLAY_REPO_REF }}
-      
       - name: Set environment variables
         id: set-env-vars
         shell: bash
