@@ -74,7 +74,7 @@ jobs:
           then
             echo "OVERLAY_REPO_REF=${{ github.event.inputs.overlay-branch }}" >> $GITHUB_OUTPUT
           else
-            echo "OVERLAY_REPO_REF=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "OVERLAY_REPO_REF=${{ github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
           fi
     
       - name: Set environment variables
