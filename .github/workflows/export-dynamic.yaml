@@ -21,7 +21,7 @@ on:
         description: Branch of the overlay structure (current branch by default).
         type: string
         required: false
-        default: '${{ github.ref_name }}'
+        default: ''
       
       upload-project-on-error:
         description: Upload the complete project as a workflow artifact in case of error in order to troubleshoot.
@@ -56,9 +56,22 @@ jobs:
       janus-cli-version: ${{ steps.set-env-vars.outputs.JANUS_CLI_VERSION }}
       workspaces: ${{ steps.gather-workspaces.outputs.workspaces }}
       upload-project-on-error: ${{ steps.set-env-vars.outputs.UPLOAD_PROJECT_ON_ERROR }}
+      overlay-repo-ref: ${{ steps.set-overlay-repo-ref.outputs.OVERLAY_REPO_REF }}
 
     steps:
+      - name: Set overlay_ref
+        id: set-overlay-repo-ref 
+        run: |
+          if [[ "${{ github.event.inputs.overlay-branch }}" != "" ]]
+          then
+            echo "OVERLAY_REPO_REF=${{ github.event.inputs.overlay-branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "OVERLAY_REPO_REF=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+    
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ needs.prepare.outputs.overlay-repo-ref }}
       
       - name: Set environment variables
         id: set-env-vars
@@ -126,7 +139,7 @@ jobs:
       plugins-repo-ref: ${{ matrix.workspace.plugins-repo-ref }}
       plugins-root: ${{ matrix.workspace.plugins-root }}
       overlay-repo: ${{ github.repository }}
-      overlay-repo-ref: ${{ github.ref_name }}
+      overlay-repo-ref: ${{ needs.prepare.outputs.overlay-repo-ref }}
       node-version: ${{ needs.prepare.outputs.node-version }}
       janus-cli-version: ${{ needs.prepare.outputs.janus-cli-version }}
       upload-project-on-error: ${{ needs.prepare.outputs.upload-project-on-error == 'true' }}
