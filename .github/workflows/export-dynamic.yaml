@@ -81,7 +81,7 @@ jobs:
           then
             echo "NODE_VERSION=${{ github.event.inputs.node-version }}" >> $GITHUB_OUTPUT
             echo "UPLOAD_PROJECT_ON_ERROR='${{ github.event.inputs.upload-project-on-error }}'" >> $GITHUB_OUTPUT
-            echo "JANUS_CLI_VERSION='${{ github.event.inputs.janus-cli-version }}'" >> $GITHUB_OUTPUT
+            echo "JANUS_CLI_VERSION=${{ github.event.inputs.janus-cli-version }}" >> $GITHUB_OUTPUT
           else
             NODE_VERSION=$(cat node-version 2> /dev/null)
             NODE_VERSION=${NODE_VERSION:-20.x}
