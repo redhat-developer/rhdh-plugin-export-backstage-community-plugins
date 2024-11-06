@@ -17,7 +17,7 @@ module.exports = async ({
     const workspaceName = workspace.workspace;
 
     const workspacePath = `workspaces/${workspaceName}`;
-    const pluginsYamlContent = workspace.plugins.map((plugin) => plugin.directory.replace(workspacePath + '/', '')).join(':\n');
+    const pluginsYamlContent = workspace.plugins.map((plugin) => `${ plugin.directory.replace(workspacePath + '/', '') }:`).join('\n');
 
     const workspaceLink = `/${pluginsRepoOwner}/${pluginsRepo}/tree/${workspaceCommit}/workspaces/${workspaceName}`;
 
