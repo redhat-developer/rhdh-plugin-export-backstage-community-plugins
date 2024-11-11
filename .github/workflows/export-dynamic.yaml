@@ -4,12 +4,9 @@ on:
     inputs:
       node-version:
         description: node-version to execute the export
+        type: string
         required: true
-        type: choice
         default: '20.x'
-        options:
-          - '18.x'
-          - '20.x'
 
       janus-cli-version:
         description: Version of the janus-idp/cli package.
