@@ -28,6 +28,13 @@ on:
         type: string
         required: false
         default: 'backstage/community-plugins'
+
+      overlay-branch:
+        description: Branch of the overlay structure (current branch by default).
+        type: string
+        required: false
+        default: ''
+
   push:
     tags:
       - "v*.*.*"
@@ -51,6 +58,7 @@ jobs:
       plugins-repo: ${{ steps.set-env-vars.outputs.PLUGINS_REPO }}
       workspaces: ${{ steps.gather-workspaces.outputs.workspaces }}
       upload-project-on-error: ${{ steps.set-env-vars.outputs.UPLOAD_PROJECT_ON_ERROR }}
+      overlay-branch: ${{ steps.set-env-vars.outputs.OVERLAY_BRANCH }}
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Set environment variables
@@ -81,6 +89,13 @@ jobs:
             PLUGINS_REPO=${PLUGINS_REPO:-backstage/community-plugins}
             echo "PLUGINS_REPO=$PLUGINS_REPO" >> $GITHUB_OUTPUT
           fi
+          if [[ "${{  github.event.inputs.overlay-branch }}" != "" ]]
+          then
+            echo "OVERLAY_BRANCH=${{ github.event.inputs.overlay-branch }}" >> $GITHUB_OUTPUT
+          else
+            OVERLAY_BRANCH=${OVERLAY_BRANCH:-''}
+            echo "OVERLAY_BRANCH=$OVERLAY_BRANCH" >> $GITHUB_OUTPUT
+          fi
           if [[ "${{  github.event.inputs.upload-project-on-error }}" != "" ]]
           then
             echo "UPLOAD_PROJECT_ON_ERROR='${{ github.event.inputs.upload-project-on-error }}'" >> $GITHUB_OUTPUT
@@ -93,8 +108,9 @@ jobs:
     with:
       node-version: ${{ needs.prepare.outputs.node-version }}
       janus-cli-version: ${{ needs.prepare.outputs.janus-cli-version }}
-      plugins-repo: ${{ needs.prepare.outputs.plugins-repo }}
+      plugins-repo: ${{ needs.prepare.outputs.plugins-repo }}      
       upload-project-on-error: ${{ needs.prepare.outputs.upload-project-on-error == 'true' }}
+      overlay-branch: ${{ needs.prepare.outputs.overlay-branch }}
 
     permissions:
       contents: write

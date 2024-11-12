@@ -31,6 +31,12 @@ on:
         required: true
         default: 'backstage/community-plugins'
 
+      overlay-branch:
+        description: Branch of the overlay structure (current branch by default).
+        type: string
+        required: false
+        default: ''
+
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
@@ -50,10 +56,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.2.2
+        if: ${{ github.event.inputs.overlay-branch == '' }} 
+
+      - uses: actions/checkout@v4.2.2
+        if: ${{ github.event.inputs.overlay-branch != '' }} 
+        with:
+          ref: ${{ github.event.inputs.overlay-branch }}
+
       - name: Set overlay_ref
         id: set-overlay-repo-ref 
         run: |
-          echo "OVERLAY_REPO_REF=${{ github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event.inputs.overlay-branch }}" != "" ]]
+          then
+            echo "OVERLAY_REPO_REF=${{ github.event.inputs.overlay-branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "OVERLAY_REPO_REF=${{ github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set environment variables
         id: set-env-vars
