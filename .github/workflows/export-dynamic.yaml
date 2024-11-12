@@ -68,7 +68,7 @@ jobs:
         id: gather-workspaces
         shell: bash
         run: |
-          workspacePath=''\
+          workspacePath=''
           if [[ "${{ github.event.inputs.workspace-path }}" != "" ]]
           then
             workspacePath="${{  github.event.inputs.workspace-path }}"

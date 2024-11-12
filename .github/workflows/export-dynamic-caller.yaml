@@ -37,7 +37,7 @@ on:
       - 'releases/**'
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -87,7 +87,7 @@ jobs:
           else
             echo "UPLOAD_PROJECT_ON_ERROR='false'" >> $GITHUB_OUTPUT
           fi
-  export:
+  parent_export:
     needs: prepare
     uses: redhat-developer/rhdh-plugin-export-backstage-community-plugins/.github/workflows/export-dynamic.yaml@main
     with:
