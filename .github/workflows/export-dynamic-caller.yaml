@@ -90,11 +90,6 @@ jobs:
   export:
     needs: prepare
     uses: redhat-developer/rhdh-plugin-export-backstage-community-plugins/.github/workflows/export-dynamic.yaml@main
-    strategy:
-      fail-fast: false
-      matrix:
-        workspace: ${{ fromJSON(needs.prepare.outputs.workspaces) }}
-
     with:
       node-version: ${{ needs.prepare.outputs.node-version }}
       janus-cli-version: ${{ needs.prepare.outputs.janus-cli-version }}
