@@ -48,69 +48,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-
-    name: Prepare
-    outputs:
-      node-version: ${{ steps.set-env-vars.outputs.NODE_VERSION }}
-      janus-cli-version: ${{ steps.set-env-vars.outputs.JANUS_CLI_VERSION }}
-      plugins-repo: ${{ steps.set-env-vars.outputs.PLUGINS_REPO }}
-      workspaces: ${{ steps.gather-workspaces.outputs.workspaces }}
-      upload-project-on-error: ${{ steps.set-env-vars.outputs.UPLOAD_PROJECT_ON_ERROR }}
-      overlay-branch: ${{ steps.set-env-vars.outputs.OVERLAY_BRANCH }}
-    steps:
-      - uses: actions/checkout@v4.2.2
-      - name: Set environment variables
-        id: set-env-vars
-        shell: bash
-        run: |
-          if [[ "${{  github.event.inputs.node-version }}" != "" ]]
-          then
-            echo "NODE_VERSION=${{ github.event.inputs.node-version }}" >> $GITHUB_OUTPUT
-          else
-            NODE_VERSION=$(cat node-version 2> /dev/null)
-            NODE_VERSION=${NODE_VERSION:-20.x}
-            echo "NODE_VERSION=$NODE_VERSION" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  github.event.inputs.janus-cli-version }}" != "" ]]
-          then
-            echo "JANUS_CLI_VERSION=${{ github.event.inputs.janus-cli-version }}" >> $GITHUB_OUTPUT
-          else
-            JANUS_CLI_VERSION=$(cat janus-cli-version 2> /dev/null)
-            JANUS_CLI_VERSION=${JANUS_CLI_VERSION:-1.13.1}
-            echo "JANUS_CLI_VERSION=$JANUS_CLI_VERSION" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  github.event.inputs.plugins-repo }}" != "" ]]
-          then
-            echo "PLUGINS_REPO=${{ github.event.inputs.plugins-repo }}" >> $GITHUB_OUTPUT
-          else
-            PLUGINS_REPO=$(cat plugins-repo 2> /dev/null)
-            PLUGINS_REPO=${PLUGINS_REPO:-backstage/community-plugins}
-            echo "PLUGINS_REPO=$PLUGINS_REPO" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  github.event.inputs.overlay-branch }}" != "" ]]
-          then
-            echo "OVERLAY_BRANCH=${{ github.event.inputs.overlay-branch }}" >> $GITHUB_OUTPUT
-          else
-            OVERLAY_BRANCH=${OVERLAY_BRANCH:-''}
-            echo "OVERLAY_BRANCH=$OVERLAY_BRANCH" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  github.event.inputs.upload-project-on-error }}" != "" ]]
-          then
-            echo "UPLOAD_PROJECT_ON_ERROR='${{ github.event.inputs.upload-project-on-error }}'" >> $GITHUB_OUTPUT
-          else
-            echo "UPLOAD_PROJECT_ON_ERROR='false'" >> $GITHUB_OUTPUT
-          fi
   parent_export:
-    needs: prepare
     uses: redhat-developer/rhdh-plugin-export-backstage-community-plugins/.github/workflows/export-dynamic.yaml@main
     with:
-      node-version: ${{ needs.prepare.outputs.node-version }}
-      janus-cli-version: ${{ needs.prepare.outputs.janus-cli-version }}
-      plugins-repo: ${{ needs.prepare.outputs.plugins-repo }}      
-      upload-project-on-error: ${{ needs.prepare.outputs.upload-project-on-error == 'true' }}
-      overlay-branch: ${{ needs.prepare.outputs.overlay-branch }}
+      node-version: ${{ github.event.inputs.node-version }}
+      janus-cli-version: ${{ github.event.inputs.janus-cli-version }}
+      plugins-repo: ${{ github.event.inputs.plugins-repo }}
+      upload-project-on-error: ${{ github.event.inputs.upload-project-on-error == 'true' }}
+      overlay-branch: ${{ github.event.inputs.overlay-branch }}
 
     permissions:
       contents: write
