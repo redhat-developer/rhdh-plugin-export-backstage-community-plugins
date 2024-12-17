@@ -31,11 +31,12 @@ jobs:
         shell: bash
         run: |
           npm install semver -g
+          regexps='@backstage-community\/'
           backstageVersions=$(cat branches.json | jq -r 'to_entries | map(.value)[]')
           plugins=$(
             comma=""
             echo '['
-            for package in $(npm search --searchlimit=1000 --json --no-description @backstage-community | jq -r '.[].name' | sort)
+            for package in $(npm search "/^(${regexps})/" --searchlimit=1000 --json --no-description --searchexclude "/^(?\!(${regexps}))/" | jq -r '.[].name' | sort)
             do
               if [[ "${package}" == *"-node" ]] || [[ "${package}" == *"-common" ]] || [[ "${package}" == *"-react" ]] 
               then
@@ -48,7 +49,7 @@ jobs:
                 continue
               fi
               echo "Fetching published versions of plugin ${package}" >&2
-              for version in $(npm view --json ${package} versions | jq -r 'if type == "string" then . else .[] end')
+              for version in $(npm view --json ${package} versions | jq -r 'if type == "string" then . else .[] end | select(test("[^-]+-.+")|not)')
               do
                 pluginInfo=$(npm view --json ${package}@${version} | jq '. | {name, version, directory: .repository.directory, gitHead }')
                 workspace=$(echo ${pluginInfo} | jq -r '.directory' | sed -e 's:workspaces/\([^/]*\)/plugins/.*:\1:')
