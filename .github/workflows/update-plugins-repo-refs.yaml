@@ -32,11 +32,12 @@ jobs:
         run: |
           npm install semver -g
           regexps='@backstage-community\/'
+          npmPackages=`npm search "/^(${regexps})/" --searchlimit=1000 --json --no-description --searchexclude "/^(?\!(${regexps}))/" | jq -r '.[].name' | sort`
           backstageVersions=$(cat branches.json | jq -r 'to_entries | map(.value)[]')
           plugins=$(
             comma=""
             echo '['
-            for package in `npm search "/^(${regexps})/" --searchlimit=1000 --json --no-description --searchexclude "/^(?\!(${regexps}))/" | jq -r '.[].name' | sort`
+            for package in ${npmPackages}
             do
               if [[ "${package}" == *"-node" ]] || [[ "${package}" == *"-common" ]] || [[ "${package}" == *"-react" ]] 
               then
