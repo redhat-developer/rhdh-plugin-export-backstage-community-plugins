@@ -36,7 +36,7 @@ jobs:
           plugins=$(
             comma=""
             echo '['
-            for package in $(npm search "/^(${regexps})/" --searchlimit=1000 --json --no-description --searchexclude "/^(?\!(${regexps}))/" | jq -r '.[].name' | sort)
+            for package in `npm search "/^(${regexps})/" --searchlimit=1000 --json --no-description --searchexclude "/^(?\!(${regexps}))/" | jq -r '.[].name' | sort`
             do
               if [[ "${package}" == *"-node" ]] || [[ "${package}" == *"-common" ]] || [[ "${package}" == *"-react" ]] 
               then
