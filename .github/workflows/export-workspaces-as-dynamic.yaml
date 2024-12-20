@@ -62,7 +62,7 @@ jobs:
       plugins-repo: ${{ inputs.plugins-repo }}
       upload-project-on-error: ${{ inputs.upload-project-on-error == 'true' }}
       overlay-branch: ${{ inputs.overlay-branch }}
-      publish-container: ${{ publish-container }}
+      publish-container: ${{ inputs.publish-container == 'true' }}
 
     permissions:
       contents: write
